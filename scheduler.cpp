@@ -11,6 +11,7 @@ namespace scheduler
 //User input is specified in the form TYPE=LIMIT
 user_input getUserInput(int argc, char** argv)
 {
+    (void)argc;
 	user_input ret;
 	
 	for(; *argv; ++argv) 
@@ -40,7 +41,14 @@ user_input getUserInput(int argc, char** argv)
 
 output generate(const ad_module& module, const graph& seqGraph, const user_input& input)
 {
+    output out;
+    (void)module;
+    (void)seqGraph;
+    (void)input;
 
+    //TODO: Produce scheduler output here
+
+    return out;
 }
 
 }

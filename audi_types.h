@@ -16,7 +16,7 @@ struct ad_input
 typedef ad_input ad_output;
 typedef ad_input ad_register;
 
-/* An single-output binary operation consisting of a number, two inputs, and output, 
+/* A single-output binary operation consisting of an id, two inputs, output,
  * type, and bitwidth. These are specified on lines like "op2 MULT 8 c1 r0 r1" */
 struct ad_binary_op
 {

@@ -17,7 +17,15 @@ void invertGraph(graph& g)
  */
 graph memoryGraph(const ad_module& m, const graph& seqGraph, const scheduler::output& schduele)
 {
+    graph g;
 
+    (void)m;
+    (void)seqGraph;
+    (void)schduele;
+
+    //TODO: Produce graph here
+
+    return g;
 }
 
 /* Generates a functional compatibility graph for the function type
@@ -28,8 +36,16 @@ graph memoryGraph(const ad_module& m, const graph& seqGraph, const scheduler::ou
 graph functionalGraph(const ad_module& m, const graph& seqGraph, 
 	const scheduler::output& schduele, const std::string& type)
 {
+    graph g;
 
+    (void)m;
+    (void)seqGraph;
+    (void)schduele;
+    (void)type;
 
+    //TODO: Produce graph here
+
+    return g;
 }
 
 }

@@ -7,7 +7,7 @@
 #include <iostream>
 
 /* A file providing various I/O and string handling utilities. */
-/****************************************************************
+/***************************************************************** */
 
 /* String Split function that skips over consecutive delimiters, 
  * and splits on more than one delimiter (Used for space and tab) */

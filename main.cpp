@@ -5,13 +5,19 @@
 
 int main(int argc, char** argv)
 {
-	ad_module m = parseAifFile(argv[1]);
-	std::cout << m << std::endl;
-	
-	auto input = scheduler::getUserInput(argc, argv);
-	std::cout << input.maxLatency << std::endl;
-	for(auto& elem : input.maxResources)
-		std::cout << elem.first << " " << elem.second;
+    //Print usage if not enough arguments
+    if(argc < 2) {
+        std::cout << "Usage: " << argv[0] << " <.aif file> [RESOUCE=LIMIT]..." << std::endl;
+    }
+
+    try {
+        ad_module m = parseAifFile(argv[1]);
+        std::cout << m << std::endl;
+    }
+    catch(std::exception& e) {
+        std::cout << e.what() << std::endl;
+        exit(1);
+    }
 	
 	return 0;
 }
