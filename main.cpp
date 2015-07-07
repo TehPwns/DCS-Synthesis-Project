@@ -8,6 +8,7 @@ int main(int argc, char** argv)
     //Print usage if not enough arguments
     if(argc < 2) {
         std::cout << "Usage: " << argv[0] << " <.aif file> [RESOUCE=LIMIT]..." << std::endl;
+        exit(1);
     }
 
     try {
