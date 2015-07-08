@@ -5,9 +5,11 @@
 #include <stdexcept>
 #include <sstream>
 #include <iostream>
+#include <type_traits>
+#include "types.h"	//for graph/digraph
 
 /* A file providing various I/O and string handling utilities. */
-/***************************************************************** */
+/************************************************************* */
 
 /* String Split function that skips over consecutive delimiters, 
  * and splits on more than one delimiter (Used for space and tab) */
@@ -57,14 +59,24 @@ std::istream& operator>>(std::istream& is, std::vector<T>& vec)
 template<typename GRAPH>
 std::string getDotGraphText(const GRAPH& g)
 {
+	//We have seperate "--" and "->" for graph/digraph
+	const char* seperator = " -- ";
+	const char* name = "graph";
+	if(std::is_same<GRAPH,digraph>::value) {
+		seperator = " -> ";
+		name = "digraph";
+	}
+
+	//Just writes each vertex across each edge
 	std::stringstream ss;
-	ss << "graph {" << std::endl;
+	ss << name << " {" << std::endl;
 	for(int i = 0; i != g.numberOfEdges(); ++i) {
 		int v0 = g.vertexOfEdge(i,0);
 		int v1 = g.vertexOfEdge(i,1);
-		ss << "\t" << v0 << " -- " << v1 << std::endl;
+		ss << "\t" << v0 << seperator << v1 << std::endl;
 	}
 	ss << "}";
+	
 	return ss.str();
 }
 
