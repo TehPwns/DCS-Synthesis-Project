@@ -14,15 +14,14 @@ namespace compatability
 void invertGraph(graph& g);
 
 /* Generates a memory compatibility graph.
- * Each vertex corresponds to an input, output, or register.
- * An edge exists between verticies i,j if the first write and 
- * final read times are not the same.
+ * Each vertex corresponds to an edge in the sequenceing graph between operations.
+ * An edge exists between verticies i,j if their lifetimes to not overlap.
  */
 graph memoryGraph(
 	const ad_module& m, const graph& seqGraph, const scheduler::output& schduele);
 
-/* Generates a functional compatibility graph for the function type
- * ("ADD", "SUB", "MULT", ...) given the global schduele and sequenceing graph.
+/* Generates a functional compatibility graph for a function type
+ * ("ADD", "SUB", "MULT", ...), given the global schduele and sequenceing graph.
  * Each vertex corresponds to an operation of type "type", and an edge exists
  * between verticies (i,j) if i is not in the same timestep of j.
  */

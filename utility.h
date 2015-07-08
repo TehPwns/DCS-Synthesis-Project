@@ -53,6 +53,21 @@ std::istream& operator>>(std::istream& is, std::vector<T>& vec)
 	return is;
 }
 
+//Generates the dot graph text for an Andres graph
+template<typename GRAPH>
+std::string getDotGraphText(const GRAPH& g)
+{
+	std::stringstream ss;
+	ss << "graph {" << std::endl;
+	for(int i = 0; i != g.numberOfEdges(); ++i) {
+		int v0 = g.vertexOfEdge(i,0);
+		int v1 = g.vertexOfEdge(i,1);
+		ss << "\t" << v0 << " -- " << v1 << std::endl;
+	}
+	ss << "}";
+	return ss.str();
+}
+
 //Used to format strings into a runtime_error.
 //See http://en.cppreference.com/w/cpp/language/parameter_pack
 template<typename... Ts>

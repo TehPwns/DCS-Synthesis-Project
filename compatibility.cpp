@@ -5,9 +5,7 @@ namespace compatiblity
 
 void invertGraph(graph& g)
 {
-	for(auto& row : g)
-		for(int& entry : row)
-			entry = (entry == 1) ? 0 : 1;
+
 }
 
 /* Generates a memory compatibility graph.

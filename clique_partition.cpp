@@ -119,7 +119,7 @@ struct clique clique_set[MAXCLIQUES];   /* stores the clique partitioning result
 /********************************************************************************/
 
 //** Changed to C++ interface on 7/1/15 **
-int input_sanity_check(const graph& compat, int array_dimension)
+int input_sanity_check(const vvint& compat, int array_dimension)
 {
     /* Verifies whether the compat array passed is valid array
      *  (1) Is each array entry =0 or 1?
@@ -150,7 +150,7 @@ int input_sanity_check(const graph& compat, int array_dimension)
   return CLIQUE_TRUE;
 }
 
-void output_sanity_check(int array_dimension, int** local_compat, const graph& compat)
+void output_sanity_check(int array_dimension, int** local_compat, const vvint& compat)
 {
     (void)array_dimension;
     /*
@@ -183,9 +183,6 @@ void output_sanity_check(int array_dimension, int** local_compat, const graph& c
             {
             member1=clique_set[i].members[j];
             member2=clique_set[i].members[k];
-
-            assert(compat[member1][member2] == 1);
-            assert(compat[member2][member1] == 1);
             assert(local_compat[member2][member1] == 1);
             assert(local_compat[member2][member1] == 1);
             }
@@ -199,7 +196,7 @@ void output_sanity_check(int array_dimension, int** local_compat, const graph& c
 }
 
 //** Changed to C++ interface on 7/1/15 **/
-void make_a_local_copy(int** local_compat, const graph& compat, int nodesize)
+void make_a_local_copy(int** local_compat, const vvint& compat, int nodesize)
 {
     int i=CLIQUE_UNKNOWN;
 
@@ -660,7 +657,7 @@ void print_clique_set()
 }
 
 //** Changed to C++ interface on 7/1/15 **
-int clique_partition(const graph& compat, int nodesize)
+int clique_partition(const vvint& compat, int nodesize)
 {
   int** local_compat=(int**) NULL;
   int* current_clique=(int*) NULL;
@@ -791,11 +788,30 @@ int clique_partition(const graph& compat, int nodesize)
 /****************************************************/
 //C++ Interface
 
+//Converts an andres graph into an adjacency matrix
+void convert_graph_to_matrix(const graph& graph, vvint& matrix)
+{
+	int n = graph.numberOfVertices();
+	matrix.resize(n);
+	for(auto& row : matrix)
+		row.resize(n);
+	for(int i = 0; i != n; ++i) {
+		for(auto it  = graph.verticesFromVertexBegin(i); 
+				 it != graph.verticesFromVertexEnd(i); ++it) {
+			matrix[i][*it] = 1;
+			matrix[*it][i] = 1;
+		}
+	}
+}
+
 vvint clique_partition(const graph& compat_graph)
 {
-    std::vector<std::vector<int>> ret;
+	//Return value and converted adjacency matrix
+    vvint ret, matrix;
 
-    clique_partition(compat_graph, compat_graph.size());
+	convert_graph_to_matrix(compat_graph, matrix);
+	
+    clique_partition(matrix, compat_graph.numberOfVertices());
 
     //Determines number of cliques
     int numCliques = 0;
