@@ -1,1 +1,1 @@
-Digital Circuit Synthesis .aif synthesys tool implementations
+Digital Circuit Synthesis .aif syntheses tool implementations

@@ -59,7 +59,7 @@ std::istream& operator>>(std::istream& is, std::vector<T>& vec)
 template<typename GRAPH>
 std::string getDotGraphText(const GRAPH& g)
 {
-	//We have seperate "--" and "->" for graph/digraph
+	//We have separate "--" and "->" for graph/digraph
 	const char* seperator = " -- ";
 	const char* name = "graph";
 	if(std::is_same<GRAPH,digraph>::value) {

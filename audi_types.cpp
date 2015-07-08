@@ -24,7 +24,7 @@ std::istream& operator>>(std::istream& is, ad_module& m)
 	bool foundEnd = false;
 	
 	/* In finding each of the lines, the beginnings are ignored here.
-	 * The indivudal input function assume there is no beginning text
+	 * The individual input function assume there is no beginning text
 	 * on the line. and if the "end" line is found, the loop terminates */
 	
 	while(std::getline(is,line)) {

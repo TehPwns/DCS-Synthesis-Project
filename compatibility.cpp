@@ -10,10 +10,10 @@ void invertGraph(graph& g)
 
 /* Generates a memory compatibility graph.
  * Each vertex corresponds to an input, output, or register.
- * An edge exists between verticies i,j if the first write and 
+ * An edge exists between vertices i,j if the first write and 
  * final read times are not the same.
  */
-graph memoryGraph(const ad_module& m, const graph& seqGraph, const scheduler::output& schduele)
+graph memoryGraph(const ad_module& m, const digraph& seqGraph, const scheduler::output& schduele)
 {
     graph g;
 
@@ -27,11 +27,11 @@ graph memoryGraph(const ad_module& m, const graph& seqGraph, const scheduler::ou
 }
 
 /* Generates a functional compatibility graph for the function type
- * ("ADD", "SUB", "MULT", ...) given the global schduele and sequenceing graph.
+ * ("ADD", "SUB", "MULT", ...) given the global schedule and sequencing graph.
  * Each vertex corresponds to an operation of type "type", and an edge exists
- * between verticies (i,j) if i is not in the same timestep of j.
+ * between vertices (i,j) if i is not in the same timestep of j.
  */
-graph functionalGraph(const ad_module& m, const graph& seqGraph, 
+graph functionalGraph(const ad_module& m, const digraph& seqGraph, 
 	const scheduler::output& schduele, const std::string& type)
 {
     graph g;

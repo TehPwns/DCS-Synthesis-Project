@@ -6,7 +6,7 @@ namespace sequence
 digraph generate(const ad_module& m)
 {
 	int numOps = m.operations.size();
-    digraph g(numOps);
+	digraph g(numOps);
 	
 	/* For each operation, we look at the operations 
 	 * coming after it. If any after it takes in the 
@@ -29,7 +29,7 @@ digraph generate(const ad_module& m)
 		}
 	}
 
-    return g;
+	return g;
 }
 
 }
