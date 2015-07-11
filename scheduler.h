@@ -28,7 +28,7 @@ struct output
 	 *   0: 3,4,5,10
 	 *   1: 1,2,7
 	 *   2: 8,9,11 */
-	vvint schduele; 	
+    vvint schedule;
 	
 	/* Map of string->int specifying the number of resources of each type allocated
 	 * Examples: 

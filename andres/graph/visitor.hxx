@@ -17,13 +17,13 @@ struct IdleGraphVisitor {
     typedef S size_type;
 
     IdleGraphVisitor() {}
-    void insertVertex(const size_type a) const {}
-    void insertVertices(const size_type a, const size_type n) const {}
-    void eraseVertex(const size_type a) const {}
-    void relabelVertex(const size_type a, const size_type b) const {}
-    void insertEdge(const size_type a) const {}
-    void eraseEdge(const size_type a) const {}
-    void relabelEdge(const size_type a, const size_type b) const {}
+    void insertVertex(const size_type) const {}
+    void insertVertices(const size_type, const size_type) const {}
+    void eraseVertex(const size_type) const {}
+    void relabelVertex(const size_type, const size_type) const {}
+    void insertEdge(const size_type) const {}
+    void eraseEdge(const size_type) const {}
+    void relabelEdge(const size_type, const size_type) const {}
 };
 
 /// Visitors can be used to follow the indices of vertices and edges.

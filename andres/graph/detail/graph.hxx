@@ -35,7 +35,7 @@ private:
 public:
     typedef typename Base::iterator_category iterator_category;
     typedef typename Base::difference_type difference_type;
-    typedef const std::size_t value_type;
+    typedef std::size_t value_type;
     typedef value_type* pointer;
     typedef value_type& reference;
 

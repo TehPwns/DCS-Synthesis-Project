@@ -6,23 +6,29 @@
 
 int main(int argc, char** argv)
 {
-	//Print usage if not enough arguments
-	if(argc < 2) {
-		std::cout << "Usage: " << argv[0] << " <.aif file> [RESOUCE=LIMIT]..." << std::endl;
-		exit(1);
-	}
+    //Print usage if not enough arguments
+    if(argc < 2) {
+        std::cout << "Usage: " << argv[0] << " <.aif file> [RESOURCE=LIMIT]..." << std::endl;
+        exit(1);
+    }
 
-	try {
-		ad_module m = parseAifFile(argv[1]);
-		std::cout << m << std::endl;
-		
-		digraph g = sequence::generate(m);
-		std::cout << getDotGraphText(g) << std::endl;
-	}
-	catch(std::exception& e) {
-		std::cout << e.what() << std::endl;
-		exit(1);
-	}
-	
-	return 0;
+    try {
+        //Parse and print .aif file
+        ad_module m = parseAifFile(argv[1]);
+        std::cout << "Parsed .aif file:\n" << m  << '\n' << std::endl;
+
+        //Generate sequencing graph and print in DOT format
+        digraph g = sequence::generate(m);
+        std::cout << "Sequence Graph in DOT format:\n" << getDotGraphText(g) << '\n' << std::endl;
+
+        //Generate module schedule and print
+        scheduler::output sched = scheduler::generate(m, g, scheduler::getUserInput(argc, argv));
+        std::cout << "Scheduler output:\n" << sched.schedule << '\n' << std::endl;
+    }
+    catch(std::exception& e) {
+        std::cout << e.what() << std::endl;
+        exit(1);
+    }
+
+    return 0;
 }

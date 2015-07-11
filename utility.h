@@ -70,7 +70,7 @@ std::string getDotGraphText(const GRAPH& g)
 	//Just writes each vertex across each edge
 	std::stringstream ss;
 	ss << name << " {" << std::endl;
-	for(int i = 0; i != g.numberOfEdges(); ++i) {
+    for(unsigned i = 0; i != g.numberOfEdges(); ++i) {
 		int v0 = g.vertexOfEdge(i,0);
 		int v1 = g.vertexOfEdge(i,1);
 		ss << "\t" << v0 << seperator << v1 << std::endl;

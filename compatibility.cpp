@@ -3,7 +3,7 @@
 namespace compatiblity
 {
 
-void invertGraph(graph& g)
+void invertGraph(graph&)
 {
 
 }

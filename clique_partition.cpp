@@ -150,7 +150,7 @@ int input_sanity_check(const vvint& compat, int array_dimension)
   return CLIQUE_TRUE;
 }
 
-void output_sanity_check(int array_dimension, int** local_compat, const vvint& compat)
+void output_sanity_check(int array_dimension, int** local_compat, const vvint&)
 {
     (void)array_dimension;
     /*
