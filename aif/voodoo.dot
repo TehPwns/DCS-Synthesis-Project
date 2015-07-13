@@ -1,0 +1,73 @@
+strict digraph  {
+	ratio="fill";
+	size="10,20!";
+
+	{
+		rank = same;
+		ranksep = equally;
+
+		x   [color=green, shape = house];
+		px0 [color=green, shape = house];
+		px1 [color=green, shape = house];
+		c1  [color=green, shape = house];
+		c2  [color=green, shape = house];
+		c3  [color=green, shape = house];
+		c4  [color=green, shape = house];
+		c5  [color=green, shape = house];
+	}
+	
+	x0 [color=purple, shape = invhouse];
+	x1 [color=purple, shape = invhouse];
+	y  [color=red, shape = invhouse];
+
+	r0 [color=blue, shape = box];
+	r1 [color=blue, shape = box];
+	r2 [color=blue, shape = box];
+	r3 [color=blue, shape = box];
+	r4 [color=blue, shape = box];
+	r5 [color=blue, shape = box];
+	r6 [color=blue, shape = box];
+	r7 [color=blue, shape = box];
+	r8 [color=blue, shape = box];
+	r9 [color=blue, shape = box];
+
+	x0 -> 8;
+	x0 -> 11;
+	1 -> r0;
+	3 -> r2;
+	2 -> r1;
+	5 -> r4;
+	4 -> r3;
+	7 -> x0;
+	6 -> x1;
+	9 -> r6;
+	8 -> r5;
+	11 -> r8;
+	10 -> r7;
+	px1 -> 4;
+	px0 -> 1;
+	13 -> y;
+	12 -> r9;
+	c3 -> 9;
+	c2 -> 5;
+	c1 -> 2;
+	x1 -> 7;
+	x1 -> 10;
+	c5 -> 10;
+	c4 -> 11;
+	r4 -> 7;
+	r4 -> 6;
+	r5 -> 9;
+	r6 -> 13;
+	r7 -> 12;
+	r0 -> 2;
+	r1 -> 3;
+	r1 -> 8;
+	r2 -> 4;
+	r2 -> 6;
+	r3 -> 5;
+	r8 -> 12;
+	r9 -> 13;
+	x -> 1;
+	x -> 3;
+}

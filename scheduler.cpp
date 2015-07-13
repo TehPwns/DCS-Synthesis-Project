@@ -11,131 +11,138 @@ namespace scheduler
 //User input is specified in the form TYPE=LIMIT
 user_input getUserInput(int argc, char** argv)
 {
-    (void)argc;
-    user_input ret;
+	(void)argc;
+	user_input ret;
 
-    for(; *argv; ++argv)
-    {
-        //Get a std string and convert to uppercase
-        std::string arg(*argv);
-        for(char& c : arg) c = std::toupper(c);
+	for(; *argv; ++argv)
+	{
+		//Get a std string and convert to uppercase
+		std::string arg(*argv);
+		for(char& c : arg) c = std::toupper(c);
 
-        //Look for equals sign
-        size_t eqpos = arg.find('=');
-        if(eqpos == std::string::npos) {
-            continue;
-        }
+		//Look for equals sign
+		size_t eqpos = arg.find('=');
+		if(eqpos == std::string::npos) {
+			continue;
+		}
 
-        //Parse "key=value" and insert into return structure
-        std::string key = arg.substr(0, eqpos);
-        int value = std::atoi(arg.substr(eqpos+1).c_str());
-        if(key == "LATENCY") {
-            ret.maxLatency = value;
-        } else {
-            ret.maxResources[key] = value;
-        }
-    }
+		//Parse "key=value" and insert into return structure
+		std::string key = arg.substr(0, eqpos);
+		int value = std::atoi(arg.substr(eqpos+1).c_str());
+		if(key == "LATENCY") {
+			ret.maxLatency = value;
+		} else {
+			ret.maxResources[key] = value;
+		}
+	}
 
-    return std::move(ret);
+	return std::move(ret);
 }
 
 output generate(const ad_module& module, const digraph& seqGraph, const user_input& input)
 {
-    output out;
-    (void)seqGraph;
+	output out;
+	(void)seqGraph;
 
-    //TODO: Produce scheduler output here
+	//TODO: Produce scheduler output here
 
-    if (input.maxLatency == -1) {
-        std::cout << "resource constrained (not implemented)" << std::endl;
+	if (input.maxLatency == -1) {
+		std::cout << "resource constrained (not implemented)" << std::endl;
 
 
-    } else {
-        std::cout << "latency constrained" << std::endl;
-        out.schedule.resize(input.maxLatency);
+	} else {
+		std::cout << "latency constrained" << std::endl;
+		out.schedule.resize(input.maxLatency);
 
-        unsigned int ops = module.operations.size();
-        unsigned int offset;
-        unsigned int stage = 0;
-        unsigned int t1, t2;
-        std::vector<unsigned int> stamp (ops);
-        std::vector<bool> ready (ops);
-        std::vector<bool>::iterator pos;
-        std::string one, two, three;
-        bool i1 = false, i2 = false;
+		unsigned int ops = module.operations.size();
+		unsigned int offset;
+		unsigned int stage = 0;
+		unsigned int t1, t2;
+		std::vector<unsigned int> stamp (ops);
+		std::vector<bool> ready (ops);
+		std::vector<bool>::iterator pos;
+		std::string one, two, three;
+		bool i1 = false, i2 = false;
 
-        /*
-            readiness precedence (descending order)
-            - both operation inputs are original module inputs
-            - both immediate ancestor edges for an operation lead to nodes that are ready
+		/* Current operation readiness requirements
+		 *
+		 *    (i1 and i2 is in the module input set)
+		 * or (i1 is a module input and i2 is from an ancestor that's ready)
+		 * or (i1 is from an ancestor that's ready and i2 is from module input)
+		 * or (i1 and i2 are from ancestors that are ready) */
 
-            if (i1 and i2 is in inputs)
-            if (i1 is an input and i2 is from ready ancestor)
-            if (i1 is from ready ancestor and i2 is from input)
-            if (i1 and i2 is from ready ancestor)
-        */
+		do {
 
-        do {
+			for (unsigned int i = 0; i < ops; i++) {
 
-            for (unsigned int i = 0; i < ops; i++) {
+				// Using the ready vector to find the earliest instances
+				// of unscheduled operations until there are none
 
-                pos = std::find(ready.begin(), ready.end(), false);
-                offset = pos - ready.begin();
+				pos = std::find(ready.begin(), ready.end(), false);
+				offset = pos - ready.begin();
 
-                if (pos == ready.end())
-                    break;
+				if (pos == ready.end())
+					break;
 
-                one = module.operations[offset].input0;
-                two = module.operations[offset].input1;
+				// Comparing the current operation's operands to all of the module inputs
+				// since those signals are considered to be ready from the start
 
-                for (unsigned int j = 0; j < module.inputs.size(); j++) {
-                    if (one.compare(module.inputs[j].name) == 0) {
-                        i1 = true;
-                        t1 = 0;
-                    }
+				one = module.operations[offset].input0;
+				two = module.operations[offset].input1;
 
-                    if (two.compare(module.inputs[j].name) == 0) {
-                        i2 = true;
-                        t2 = 0;
-                    }
+				for (unsigned int j = 0; j < module.inputs.size(); j++) {
+					if (one.compare(module.inputs[j].name) == 0) {
+						i1 = true;
+						t1 = 0;
+					}
 
-                    if (i1 && i2)
-                        break;
-                }
+					if (two.compare(module.inputs[j].name) == 0) {
+						i2 = true;
+						t2 = 0;
+					}
 
-                for (unsigned int j = 0; j < ops; j++) {
-                    three = module.operations[j].output;
+					if (i1 && i2)
+						break;
+				}
 
-                    if (ready[j] && three.compare(one) == 0) {
-                        i1 = true;
-                        t1 = stamp[j];
-                    }
+				/* Comparing the output signals of all other operations to the
+				 * input signal of the current one, using their time stamps to
+				 * determine the earliest possible time to schedule the current
+				 * operation, along with updating the timestamp/readiness vectors */
 
-                    if (ready[j] && three.compare(two) == 0) {
-                        i2 = true;
-                        t2 = stamp[j];
-                    }
+				for (unsigned int j = 0; j < ops; j++) {
+					three = module.operations[j].output;
 
-                    if ((i1 && i2) && !ready[offset]) {
-                        ready[offset] = true;
-                        stamp[offset] = ((t1 > t2) ? t1 : t2) + 1;
-                        out.schedule[stamp[offset] - 1].push_back(offset + 1);
-                        i1 = i2 = false;
-                        break;
-                    }
-                }
+					if (ready[j] && three.compare(one) == 0) {
+						i1 = true;
+						t1 = stamp[j];
+					}
 
-                //std::cout << ready << std::endl;
-                // std::cout << stamp << std::endl;
-            }
+					if (ready[j] && three.compare(two) == 0) {
+						i2 = true;
+						t2 = stamp[j];
+					}
 
-            ++stage;
+					if ((i1 && i2) && !ready[offset]) {
+						ready[offset] = true;
+						stamp[offset] = ((t1 > t2) ? t1 : t2) + 1;
+						out.schedule[stamp[offset] - 1].push_back(offset + 1);
+						i1 = i2 = false;
+						break;
+					}
+				}
 
-        } while (stage < ops);
+				// std::cout << ready << std::endl;
+				// std::cout << stamp << std::endl;
+			}
 
-    }
+			++stage;
 
-    return out;
+		} while (stage < ops);
+
+	}
+
+	return out;
 }
 
 }
