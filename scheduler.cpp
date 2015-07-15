@@ -44,6 +44,19 @@ output generate(const ad_module& module, const digraph& seqGraph, const user_inp
 	output out;
 	(void)seqGraph;
 
+	unsigned int ops = module.operations.size();
+	unsigned int offset;
+	unsigned int t1, t2;
+	unsigned i, j;
+	std::vector<unsigned int> stamp (ops);
+	std::vector<bool> ready (ops);
+	std::vector<bool>::iterator pos;
+	std::string one, two, three;
+	bool i1 = false, i2 = false;
+	
+	out.schedule.resize(ops);
+	out.schedule_alt.resize(ops);
+
 	//TODO: Produce scheduler output here
 
 	if (input.maxLatency == -1) {
@@ -52,17 +65,6 @@ output generate(const ad_module& module, const digraph& seqGraph, const user_inp
 
 	} else {
 		std::cout << "latency constrained" << std::endl;
-		out.schedule.resize(input.maxLatency);
-
-		unsigned int ops = module.operations.size();
-		unsigned int offset;
-		unsigned int stage = 0;
-		unsigned int t1, t2;
-		std::vector<unsigned int> stamp (ops);
-		std::vector<bool> ready (ops);
-		std::vector<bool>::iterator pos;
-		std::string one, two, three;
-		bool i1 = false, i2 = false;
 
 		/* Current operation readiness requirements
 		 *
@@ -73,7 +75,7 @@ output generate(const ad_module& module, const digraph& seqGraph, const user_inp
 
 		do {
 
-			for (unsigned int i = 0; i < ops; i++) {
+			for (i = 0; i < ops; i++) {
 
 				// Using the ready vector to find the earliest instances
 				// of unscheduled operations until there are none
@@ -90,7 +92,7 @@ output generate(const ad_module& module, const digraph& seqGraph, const user_inp
 				one = module.operations[offset].input0;
 				two = module.operations[offset].input1;
 
-				for (unsigned int j = 0; j < module.inputs.size(); j++) {
+				for (j = 0; j < module.inputs.size(); j++) {
 					if (one.compare(module.inputs[j].name) == 0) {
 						i1 = true;
 						t1 = 0;
@@ -110,7 +112,7 @@ output generate(const ad_module& module, const digraph& seqGraph, const user_inp
 				 * determine the earliest possible time to schedule the current
 				 * operation, along with updating the timestamp/readiness vectors */
 
-				for (unsigned int j = 0; j < ops; j++) {
+				for (j = 0; j < ops; j++) {
 					three = module.operations[j].output;
 
 					if (ready[j] && three.compare(one) == 0) {
@@ -136,11 +138,15 @@ output generate(const ad_module& module, const digraph& seqGraph, const user_inp
 				// std::cout << stamp << std::endl;
 			}
 
-			++stage;
-
-		} while (stage < ops);
+		} while (pos != ready.end());
 
 	}
+
+	for (i = 0; out.schedule[i].size() != 0; i++)
+		for (j = 0; j < out.schedule[i].size(); j++)
+			out.schedule_alt[out.schedule[i][j] - 1] = i + 1;
+
+	out.schedule.resize(i);
 
 	return out;
 }
