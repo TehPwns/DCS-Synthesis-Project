@@ -14,8 +14,10 @@ namespace compatability
 void invertGraph(graph& g);
 
 /* Generates a memory compatibility graph.
- * Each vertex corresponds to an edge in the sequencing graph between operations.
- * An edge exists between vertices i,j if their lifetimes do not overlap.
+ * Each vertex corresponds to a sequencing graph operation. An edge exists between
+ * verticies i and j if start(i)+delay(i) <= start(j). The start times of each vertex
+ * are located in the scheduler output. We define the "delay" as the start time of
+ * the latest vertex i has an edge to MINUS the start time of i.
  */
 graph memoryGraph(
 	const ad_module& m, const digraph& seqGraph, const scheduler::output& schduele);
