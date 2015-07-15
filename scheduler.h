@@ -29,6 +29,7 @@ struct output
 	 *   1: 1,2,7
 	 *   2: 8,9,11 */
     vvint schedule;
+    std::vector<int> schedule_alt;
 	
 	/* Map of string->int specifying the number of resources of each type allocated
 	 * Examples: 

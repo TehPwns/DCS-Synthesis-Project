@@ -24,6 +24,7 @@ int main(int argc, char** argv)
         //Generate module schedule and print
         scheduler::output sched = scheduler::generate(m, g, scheduler::getUserInput(argc, argv));
         std::cout << "Scheduler output:\n" << sched.schedule << '\n' << std::endl;
+        std::cout << "O(n) goodness:\n" << sched.schedule_alt << '\n' << std::endl;
     }
     catch(std::exception& e) {
         std::cout << e.what() << std::endl;
