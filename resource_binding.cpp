@@ -56,6 +56,8 @@ vvint buildBind(const ad_module& module, const digraph& seqGraph,
         int e1 = 0;													//(start with ending edge time of 0)
         for (auto j =  seqGraph.verticesFromVertexBegin(i);
                   j != seqGraph.verticesFromVertexEnd(i); ++j) {             //for each vertex reachable from said vertex i
+            if(!b && module.operations[*j].type != type)
+                continue;
             e1 = std::max(e1, checkSchd(sch, !b ? relationIndex[*j] : *j)); //for each vertex j, if b use j, if b! use relationIndex
         }
 
@@ -71,6 +73,8 @@ vvint buildBind(const ad_module& module, const digraph& seqGraph,
             int e2 = 0;                                               //(start with ending edge time of 0)
             for (auto l = seqGraph.verticesFromVertexBegin(k);
                       l < seqGraph.verticesFromVertexEnd(k); ++l) {   //for each vertex l, if b use l, if b! use relationIndex
+                if(!b && module.operations[*l].type != type)
+                    continue;
                 e2 = std::max(e2, checkSchd(sch, !b ? relationIndex[*l] : *l));
             }
 
