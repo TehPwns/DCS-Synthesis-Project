@@ -1,6 +1,8 @@
 #ifndef RESOURCE_BINDING_H
 #define RESOURCE_BINDING_H
 #include "types.h"
+#include "audi_types.h"
+#include "scheduler.h"
 
 namespace binding
 {
@@ -19,7 +21,7 @@ namespace binding
  *  1:  3,4
  *  2:  6
  */
-vvint registerBind(const digraph& seqGraph);
+vvint registerBind(const ad_module& module, const scheduler::output sch, const digraph& seqGraph);
 
 /* Given the conflict graph for operation of type `type`, (P. 233) binds the
  * operations to function units.
@@ -31,20 +33,7 @@ vvint registerBind(const digraph& seqGraph);
  * Output: vvint[i][j] where i is a functional unit and j is bound to i
  *  Here, each j is a vertex in the sequencing graph.
  */
-vvint functionalBind(const graph& function_conflict, const std::string& type, const ad_module& module);
-
-vvint buildBind(const ad_module& module, vvint seqGraph, bool b, string op);
-/*
-*Function builds a compatibility graph based on which functin (registerBind or functionalBind) called it
-*Then takes graph output for that and feeds into clique partitioning function, which feeds back a vvint
-*vector of vectors of cliques:
-* A sample output would be:
-*   Clique #0 (size = 3) = {  7  3  0  }
-*   Clique #1 (size = 2) = {  5  1  }
-*   Clique #2 (size = 1) = {  8  }
-*/
-
-int checkSchd(const vertex);
+vvint functionalBind(const ad_module& module, const scheduler::output sch, const digraph& seqGraph, const std::string& type);
 
 }
 

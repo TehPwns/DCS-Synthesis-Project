@@ -3,6 +3,7 @@
 #include "scheduler.h"
 #include "sequence_graph.h"
 #include "utility.h"
+#include "resource_binding.h"
 
 int main(int argc, char** argv)
 {
@@ -24,7 +25,11 @@ int main(int argc, char** argv)
         //Generate module schedule and print
         scheduler::output sched = scheduler::generate(m, g, scheduler::getUserInput(argc, argv));
         std::cout << "Scheduler output:\n" << sched.schedule << '\n' << std::endl;
-        std::cout << "O(n) goodness:\n" << sched.schedule_alt << '\n' << std::endl;
+        std::cout << "O(1) goodness:\n" << sched.schedule_alt << '\n' << std::endl;
+
+        //Generate function and memory resource binding (prints graph too in DOT)
+        vvint binding = binding::functionalBind(m, sched, g, "ADD");
+        std::cout << binding << std::endl;
     }
     catch(std::exception& e) {
         std::cout << e.what() << std::endl;

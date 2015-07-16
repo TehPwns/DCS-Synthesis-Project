@@ -29,6 +29,8 @@ struct output
 	 *   1: 1,2,7
 	 *   2: 8,9,11 */
     vvint schedule;
+
+    /* Alternate scheduele, format, index by vertex and start tme is returned */
     std::vector<int> schedule_alt;
 	
 	/* Map of string->int specifying the number of resources of each type allocated
