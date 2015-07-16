@@ -28,7 +28,7 @@ int main(int argc, char** argv)
         std::cout << "O(1) goodness:\n" << sched.schedule_alt << '\n' << std::endl;
 
         //Generate function and memory resource binding (prints graph too in DOT)
-        vvint binding = binding::functionalBind(m, sched, g, "ADD");
+        vvint binding = binding::registerBind(m, sched, g);
         std::cout << binding << std::endl;
     }
     catch(std::exception& e) {

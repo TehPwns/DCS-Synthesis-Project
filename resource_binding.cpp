@@ -46,6 +46,10 @@ vvint buildBind(const ad_module& module, const digraph& seqGraph,
     graph rBinding(n);
 
     for (unsigned i=0; i < rBinding.numberOfVertices(); ++i) { 	//for each vertex i, if b use i, if b! use relationIndex
+        //Skip operations not of this type on functional binding
+        if(!b && module.operations[i].type != type)
+            continue;
+
         int s1 = 0;
         s1 = checkSchd(sch, !b ? relationIndex[i] : i);
 
@@ -57,6 +61,10 @@ vvint buildBind(const ad_module& module, const digraph& seqGraph,
 
         //do same thing here to find e2
         for (unsigned k = 0; k < rBinding.numberOfVertices(); ++k) {  //for each vertex k, if b use k, if b! use relationIndex
+            //Skip operations not of this type
+            if(!b && module.operations[k].type != type)
+                continue;
+
             int s2 = 0;
             s2 = checkSchd(sch, !b ? relationIndex[k] : k);
 
@@ -66,13 +74,11 @@ vvint buildBind(const ad_module& module, const digraph& seqGraph,
                 e2 = std::max(e2, checkSchd(sch, !b ? relationIndex[*l] : *l));
             }
 
-            //do some voodoo here to compare e1 to e1 then teleport back to find e2 again,
+            //Here we determine if the verticies with their start/ends are compatible.
+            //Do some voodoo here to compare e1 to e1 then teleport back to find e2 again,
             //then e1 after deciding if inserting edge or not.
-            if((i != k) && !((e1 == e2) || (s1 == s2) || ((s1 < s2) && (e1 > s2))) && (b)){ //check for compatibility && reg bind bool (true - reg.bind)
-                rBinding.insertEdge(i,k); 													//and create connection for registers if gucci.
-            }
-            else if((i != k) && !((e1 == e2) || (s1 == s2) || ((s1 < s2) && (e1 > s2))) && (!b)){			//else check for compatibility and reg bool (false - f.u.)
-                rBinding.insertEdge(i,k);																	//and create connection for functional units if gucci.
+            if((i != k) && (!((e1 == e2) || (s1 == s2) || ((s1 < s2) && (e1 > s2))))) {
+                rBinding.insertEdge(i,k);
             }
         }
     }
@@ -81,6 +87,13 @@ vvint buildBind(const ad_module& module, const digraph& seqGraph,
 
     //after graph, do this stuff:
     vvint result = clique_partition(rBinding); //not sure where to go after here-----------------Call clique partition on the binding
+
+    //On functional binding, convert cliques given of relational verticies to absolute verticies
+    if(!b) {
+        for(auto& row : result)
+            for(int& item : row)
+                item = relationIndex[item];
+    }
 
     //for(auto& clique : result)
     {
