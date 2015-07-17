@@ -22,7 +22,9 @@ namespace binding
  *  1:  3,4
  *  2:  6
  */
-vvint registerBind(const ad_module& module, const scheduler::output sch, const digraph& seqGraph);
+vvint registerBind(const ad_module& module,
+                   const scheduler::output sch,
+                   const digraph& seqGraph);
 
 /* Given the conflict graph for operation of type `type`, (P. 233) binds the
  * operations to function units.
@@ -34,7 +36,11 @@ vvint registerBind(const ad_module& module, const scheduler::output sch, const d
  * Output: vvint[i][j] where i is a functional unit and j is bound to i
  *  Here, each j is a vertex in the sequencing graph.
  */
-vvint functionalBind(const ad_module& module, const scheduler::output sch, const digraph& seqGraph, const std::string& type);
+vvint functionalBind(const ad_module& module,
+                     const scheduler::output sch,
+                     const digraph& seqGraph,
+                     const std::string& type,
+                     std::string &conflict_out);
 
 }
 

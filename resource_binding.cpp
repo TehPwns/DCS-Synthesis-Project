@@ -23,7 +23,10 @@ int checkSchd(const scheduler::output& scheduele, int vertex)
 *   Clique #2 (size = 1) = {  8  }
 */
 vvint buildBind(const ad_module& module, const digraph& seqGraph,
-                const scheduler::output sch, bool b, const std::string& type) //DOUBLE CHECK THIS, YEA THIS!
+                const scheduler::output sch, bool b,
+                const std::string& type,
+                std::string& conflict_out
+                ) //DOUBLE CHECK THIS, YEA THIS!
 {
     int n = 0;                              //Number of verticies to build conflict graph over
     std::vector<int> relationIndex;
@@ -87,8 +90,6 @@ vvint buildBind(const ad_module& module, const digraph& seqGraph,
         }
     }
 
-    std::cout << "Binding for " << type << ":\n" << getDotGraphText(rBinding) << std::endl;
-
     //after graph, do this stuff:
     vvint result = clique_partition(rBinding); //not sure where to go after here-----------------Call clique partition on the binding
 
@@ -99,25 +100,29 @@ vvint buildBind(const ad_module& module, const digraph& seqGraph,
                 item = relationIndex[item];
     }
 
-    //for(auto& clique : result)
-    {
-        //allocate new register R
-        //Bind all edges in c to R
-    }
+    //Output conflict graph upwards
+    conflict_out = getDotGraphText(rBinding);
 
     return result;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------
 
-vvint registerBind(const ad_module& module, const scheduler::output sch, const digraph& seqGraph)
+vvint registerBind(const ad_module& module,
+                   const scheduler::output sch,
+                   const digraph& seqGraph)
 {
-    return buildBind(module, seqGraph, sch, true, "");
+    std::string dummy;
+    return buildBind(module, seqGraph, sch, true, "", dummy);
 }
 
-vvint functionalBind(const ad_module& module, const scheduler::output sch, const digraph& seqGraph, const std::string& type)
+vvint functionalBind(const ad_module& module,
+                     const scheduler::output sch,
+                     const digraph& seqGraph,
+                     const std::string& type,
+                     std::string& conflict_out)
 {
-    return buildBind(module, seqGraph, sch, false, type);
+    return buildBind(module, seqGraph, sch, false, type, conflict_out);
 }
 
 }

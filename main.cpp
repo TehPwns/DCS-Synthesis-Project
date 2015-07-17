@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include "output.h"
 
 int main(int argc, char** argv)
@@ -10,10 +11,19 @@ int main(int argc, char** argv)
     }
 
     try {
-        std::cout << output::getOutput(argc, argv) << std::endl;
+        std::fstream output_file("output.txt", std::ios::out);
+        std::fstream graph_file("graphs.txt", std::ios::out);
+
+        //Get output texts
+        auto text_pair = output::getOutput(argc, argv);
+        output_file << text_pair.first  << std::endl;
+        graph_file  << text_pair.second << std::endl;
+
+        //Generates cool images
+        system("dot graphs.txt -O -Tpng");
     }
     catch(std::exception& e) {
-        std::cout << e.what() << std::endl;
+        std::cerr << e.what() << std::endl;
         exit(1);
     }
 

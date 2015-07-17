@@ -1,27 +1,14 @@
 #include <iostream>
 #include <string>
+#include <unordered_map>
 #include "audi_parse.h"
 #include "scheduler.h"
 #include "sequence_graph.h"
 #include "utility.h"
 #include "resource_binding.h"
-#include <unordered_map>
 
 namespace output
 {
-
-std::pair<std::set<std::string>, std::vector<std::string>>
-getFunctionUnitInfo(const ad_module& module)
-{
-    std::set<std::string> funcunits;
-    std::vector<std::string> vertices;
-    for(const ad_binary_op& op : module.operations){    //for each module.operations[i]
-        funcunits.insert(op.type);                      //push operation type string into a set funcunits
-        vertices.push_back(op.type);                    //push operation type string into vector (use index to denote vertex,
-    }                                                   //item to denote function type)
-    return std::make_pair(std::move(funcunits), std::move(vertices));
-}
-
 
 template<typename GRAPH>
 std::string getFinalDotGraphText(const GRAPH& g, const ad_module& m, const scheduler::output& sch)
@@ -69,8 +56,99 @@ std::string getFinalDotGraphText(const GRAPH& g, const ad_module& m, const sched
     return ss.str();
 }
 
+std::set<std::string> getFunctionUnitInfo(const ad_module& module)
+{
+    std::set<std::string> funcunits;
+    for(const ad_binary_op& op : module.operations) {   //for each module.operations[i]
+        funcunits.insert(op.type);                      //push operation type string into a set funcunits
+    }                                                   //item to denote function type)
+    return std::move(funcunits);
+}
 
-std::string getOutput(int argc, char** argv)
+typedef std::vector<std::pair<std::string, vvint>> functional_bindings;
+
+/* Generates the actual text to put in the file */
+std::string getOutputFileText(const functional_bindings& func_bindings, const vvint& mem_bindings)
+{
+    std::stringstream ss;
+
+    //Text for all multiplexers generated across registers and functional units
+    std::vector<std::string> multiplexer_text;
+
+    /* Put each functional unit in the file and what it is bound to
+     * under it */
+    for(const auto& binding_pair : func_bindings)
+    {
+        //Get info and output header. Ex: "N ADD Units:"
+            std::string name = binding_pair.first;
+        const vvint& binding = binding_pair.second;
+        ss << binding.size() << " " << name << " functional units:" << std::endl;
+
+        //Output each unit and what is bound to it
+        int i = 0;
+        for(const auto& cliques : binding) {
+            ss << "\t" << name << i++ << ": " << cliques << std::endl;
+            if(cliques.size() > 1) {
+                std::stringstream mstream;
+                mstream << "\t"    << "MUX"  << multiplexer_text.size() << ": "
+                        << cliques << " -> " << name << i;
+                multiplexer_text.push_back(mstream.str());
+            }
+        }
+        ss << "\n";
+    }
+
+    /* Output register usage */
+    ss << mem_bindings.size() << " " << "registers needed:" << std::endl;
+    int i = 0;
+    for(const auto& binding : mem_bindings) {
+        ss << "\tR" << i++ << ": " << binding << std::endl;
+        if(binding.size() > 1) {
+            std::stringstream mstream;
+            mstream << "\t"    << "MUX"  << multiplexer_text.size() << ": "
+                    << binding << " -> " << "R" << i;
+            multiplexer_text.push_back(mstream.str());
+        }
+    }
+    ss << '\n';
+
+    /* Print out accumulated multiplexers */
+    ss << multiplexer_text.size() << " multiplexers needed: " << std::endl;
+    for(const std::string& mux : multiplexer_text) {
+        ss << mux << std::endl;
+    }
+
+    return ss.str();
+}
+
+std::string getGraphFileText(
+    const ad_module& module,
+    const digraph& seqGraph,
+    const scheduler::output& sch,
+    const std::vector<std::pair<std::string,std::string>>& conflict_texts)
+{
+    std::stringstream ss;
+
+    //Put SeqGraph
+    ss << "#Sequence Graph:" << std::endl;
+    ss << getDotGraphText(seqGraph) << std::endl;
+    ss << std::endl;
+
+    //Put all conflict graphs
+    for(auto& conflict_graph : conflict_texts) {
+        ss << "#" << conflict_graph.first  << " compatibility graph:" << std::endl;
+        ss << conflict_graph.second << std::endl;
+        ss << std::endl;
+    }
+
+    //Put scheduled graph
+    ss << "#Scheduled sequence graph: " << std::endl;
+    ss << getFinalDotGraphText(seqGraph, module, sch) << std::endl;
+
+    return ss.str();
+}
+
+std::pair<std::string,std::string> getOutput(int argc, char** argv)
 {
     //Parse and print .aif file
     ad_module m = parseAifFile(argv[1]);
@@ -81,12 +159,24 @@ std::string getOutput(int argc, char** argv)
     //Generate module schedule and print
     scheduler::output sched = scheduler::generate(m, g, scheduler::getUserInput(argc, argv));
 
-    auto pair = getFunctionUnitInfo(m);
+    /* Get all types of funtions in module and bind resources for each
+     * type of operation in the module */
+    auto typeset = getFunctionUnitInfo(m);
+    functional_bindings bindings;
+    std::vector<std::pair<std::string,std::string>> conflict_texts;
+    for(const std::string& type : typeset) {
+        std::string conflict_out;
+        bindings.push_back(
+            std::make_pair(type, binding::functionalBind(m, sched, g, type, conflict_out)) );
+        conflict_texts.push_back( std::make_pair(type, std::move(conflict_out)) );
+    }
 
-    //Generate function and memory resource binding (prints graph too in DOT)
-    vvint binding = binding::functionalBind(m, sched, g, "ADD");
+    //Generate function and memory resource binding
+    vvint memory_binding = binding::registerBind(m, sched, g);
 
-    return getFinalDotGraphText(g, m, sched);
+    return std::make_pair(
+        getOutputFileText(bindings, memory_binding),
+        getGraphFileText(m, g, sched, conflict_texts));
 }
 
 }
