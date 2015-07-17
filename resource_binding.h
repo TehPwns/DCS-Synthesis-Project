@@ -3,6 +3,7 @@
 #include "types.h"
 #include "audi_types.h"
 #include "scheduler.h"
+#include "utility.h"
 
 namespace binding
 {

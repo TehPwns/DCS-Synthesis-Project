@@ -142,9 +142,13 @@ output generate(const ad_module& module, const digraph& seqGraph, const user_inp
 
 	}
 
+    for(auto& row : out.schedule)
+        for(int& item : row)
+            item -= 1;
+
 	for (i = 0; out.schedule[i].size() != 0; i++)
 		for (j = 0; j < out.schedule[i].size(); j++)
-			out.schedule_alt[out.schedule[i][j] - 1] = i + 1;
+            out.schedule_alt[out.schedule[i][j]] = i + 1;
 
 	out.schedule.resize(i);
 

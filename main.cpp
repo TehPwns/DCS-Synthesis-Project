@@ -4,6 +4,55 @@
 #include "sequence_graph.h"
 #include "utility.h"
 #include "resource_binding.h"
+#include <unordered_map>
+
+template<typename GRAPH>
+std::string getFinalDotGraphText(const GRAPH& g, const ad_module& m, const scheduler::output& sch)
+{
+    std::unordered_map<std::string, std::string> opmap = {
+        {"ADD",  "color=blue, shape = box"},
+        {"MULT", "color=green, shape = invhouse"},
+        {"SUB", "color=red, shape = invhouse"}
+    };
+
+    std::stringstream ss;
+    std::string text = getDotGraphText(g);
+    std::vector<std::string> split = Split(text,"\n");
+
+    ss << "digraph {" << std::endl;
+    ss << "\tnode [style=filled];" << std::endl;
+
+    //Print types
+    ss << "\t{" << std::endl;
+    for(const ad_binary_op& op : m.operations) {
+        auto it = opmap.find(op.type);
+        if(it != opmap.end()) {
+            ss << "\t\t" << op.number-1 << " [" << it->second << "]" << std::endl;
+        }
+    }
+    ss << "\t}\n" << std::endl;
+
+    //Make same scheduled timesteps same rank
+    for(auto& row : sch.schedule) {
+        ss << "\t{ rank=same; ";
+        for(auto& item : row)
+            ss << std::to_string(item) << "; ";
+        ss << "}" << std::endl;
+    }
+    ss << '\n';
+
+    //Place the "a -- b" lines only into the output
+    for(std::string& s : split) {
+        if(s.find_first_of("{}") == std::string::npos) {
+            ss << s << std::endl;
+        }
+    }
+
+    ss << "}" << std::endl;
+    return ss.str();
+}
+
+/*****************************************************************/
 
 int main(int argc, char** argv)
 {
@@ -30,6 +79,8 @@ int main(int argc, char** argv)
         //Generate function and memory resource binding (prints graph too in DOT)
         vvint binding = binding::functionalBind(m, sched, g, "ADD");
         std::cout << binding << std::endl;
+
+        std::cout << getFinalDotGraphText(g, m, sched) << std::endl;
     }
     catch(std::exception& e) {
         std::cout << e.what() << std::endl;
