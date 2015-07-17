@@ -4,7 +4,7 @@
 namespace output
 {
 
-
+std::string getOutput(int argc, char** argv);
 
 }
 
